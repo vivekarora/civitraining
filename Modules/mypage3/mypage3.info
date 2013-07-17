@@ -1,0 +1,9 @@
+name = My Page 3
+description =  My Page 3.
+core = 7.x
+version = 1.0
+package = CiviCRM
+
+dependencies[] = civicrm
+
+

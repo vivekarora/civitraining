@@ -1,0 +1,195 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
+ *
+ */
+class CRM_Contact_Form_Search_Custom_CustomFieldSearch implements CRM_Contact_Form_Search_Interface {
+
+  protected $_formValues;
+  public $_permissionedComponent;
+
+  function __construct(&$formValues) {
+    $this->_formValues = $formValues;
+    /**
+     * Define the columns for search result rows
+     */
+
+    $this->_columns = array(
+      ts('Contact Id') => 'contact_id',
+      ts('Name') => 'sort_name',
+      ts('Soap Selection') => 'soup_selection_4'
+    );
+
+    // define component access permission needed
+ //   $this->_permissionedComponent = 'CiviContribute';
+  }
+
+  function buildForm(&$form) {
+
+    /**
+     * You can define a custom title for the search form
+     */
+    $this->setTitle('Find Custom Field');
+
+    /**
+     * Define the search form fields here
+     */
+    $form->add('text',
+      'food_prefrence',
+      ts('Food Prefrence')
+    );
+  
+
+    /**
+     * If you are using the sample template, this array tells the template fields to render
+     * for the search form.
+     */
+    $form->assign('elements', array('food_prefrence'));
+  }
+
+  /**
+   * Define the smarty template used to layout the search form and results listings.
+   */
+  function templateFile() {
+    return 'CRM/Contact/Form/Search/Custom/NiSearch.tpl';
+  }
+
+  /**
+   * Construct the search query
+   */
+  function all($offset = 0, $rowcount = 0, $sort = NULL,
+    $includeContactIDs = FALSE, $justIDs = FALSE
+  ) {
+
+    // SELECT clause must include contact_id as an alias for civicrm_contact.id
+    if ($justIDs) {
+      $select = "contact_a.id as contact_id";
+    }
+    else {
+      $select = "
+ contact_a.id as contact_id,
+contact_a.sort_name as sort_name
+";
+    }
+    $from = $this->from();
+
+    $where = $this->where($includeContactIDs);
+
+
+    $sql = "
+SELECT $select
+FROM   $from
+WHERE  $where
+";
+    //for only contact ids ignore order.
+    if (!$justIDs) {
+      // Define ORDER BY for query in $sort, with default value
+      if (!empty($sort)) {
+        if (is_string($sort)) {
+          $sql .= " ORDER BY $sort ";
+        }
+        else {
+          $sql .= " ORDER BY " . trim($sort->orderBy());
+        }
+      }
+      else {
+        $sql .= "ORDER BY sort_name desc";
+      }
+    }
+
+    if ($rowcount > 0 && $offset >= 0) {
+      $sql .= " LIMIT $offset, $rowcount ";
+    }
+
+    return $sql;
+  }
+
+  function from() {
+    return "
+civicrm_value_food_preference_2 AS cust_table,
+civicrm_contact AS contact_a,
+civicrm_participant AS participant";
+  }
+
+  /*
+      * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
+      *
+      */
+  function where($includeContactIDs = FALSE) {
+    $clauses = array();
+
+    $clauses[] = "cust_table.entity_id = contact_a.id";
+    $clauses[] = "cust_table.entity_id = participant.contact_id";
+    
+    $foodPrefrence = $this->_formValues['food_prefrence'];
+    if ($foodPrefrence) {
+      $clauses[] = "cust_table.soup_selection_4 LIKE '%$foodPrefrence%'";
+    }
+
+    return implode(' AND ', $clauses);
+  }
+
+
+  /*
+     * Functions below generally don't need to be modified
+     */
+  function count() {
+    $sql = $this->all();
+
+    $dao = CRM_Core_DAO::executeQuery($sql,
+      CRM_Core_DAO::$_nullArray
+    );
+    return $dao->N;
+  }
+
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
+  function &columns() {
+    return $this->_columns;
+  }
+
+  function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
+  }
+
+  function summary() {
+    return NULL;
+  }
+}
+

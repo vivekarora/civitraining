@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<extension key="org.mypage2" type="module">
+  <file>mypage2</file>
+  <name>My Page</name>
+  <description>My Page</description>
+  <license>GPL</license>
+  <maintainer>
+    <author>Vivek Arora</author>
+    <email>vivek.arora@thetigroup.com</email>
+  </maintainer>
+  <releaseDate>2013-07-16</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <civix>
+    <namespace>CRM/Mypage2</namespace>
+  </civix>
+</extension>

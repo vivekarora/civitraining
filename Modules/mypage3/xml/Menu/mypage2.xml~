@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/mypage2/view</path>
+    <page_callback>CRM_Mypage2_Page_MyPage2</page_callback>
+    <title>My Page</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mypage2/edit</path>
+    <page_callback>CRM_Mypage2_Form_EditLoggedInUser</page_callback>
+    <title>Edit Logged In User</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<extension key="report.summary.donor" type="report">
+  <file>donor</file>
+  <name>Test Contribution Summary</name>
+  <description>	Groups and totals contributions by criteria including contact, time period, contribution type, contributor location, etc.</description>
+  <license>AGPL</license>
+  <maintainer>
+    <author>Vivek Arora</author>
+    <email>vivek.arora@zinfit.org.uk</email>
+  </maintainer>
+  <releaseDate>2013-07-09</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <civix/>
+  <typeInfo>
+    <component>CiviContribute</component>
+    <reportUrl>report.summary.donor</reportUrl>
+  </typeInfo>
+</extension>

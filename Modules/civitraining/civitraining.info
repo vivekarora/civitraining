@@ -1,0 +1,9 @@
+name = CiviCRM Training
+description =  CiviCRM Training module.
+core = 7.x
+version = 1.0
+package = CiviCRM
+
+dependencies[] = civicrm
+
+

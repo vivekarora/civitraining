@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<extension key="report.myconstituent.summary" type="report">
+  <file>summary</file>
+  <name>My Constituent Summary Report</name>
+  <description>My Constituent Summary Report</description>
+  <license></license>
+  <maintainer>
+    <author>Vivek Arora</author>
+    <email>vivek.arora@zingit.org.uk</email>
+  </maintainer>
+  <releaseDate>2013-07-12</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <comments>My Constituent Summary Report</comments>
+  <civix/>
+  <typeInfo>
+    <component>Contact</component>
+    <reportUrl>report.myconstituent.summary</reportUrl>
+  </typeInfo>
+</extension>

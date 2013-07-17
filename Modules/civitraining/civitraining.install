@@ -1,0 +1,60 @@
+<?php
+
+// $Id$
+/**
+* @file
+* Module for managing links of social networking sites.
+*/
+
+
+/**
+* Implementation of hook_install().
+*/
+function civitraining_install() {
+// Use schema API to create database table.
+ civicrm_initialize();
+drupal_install_schema('civitraining');
+}
+
+
+
+/**
+* Implementation of hook_uninstall().
+*/
+function civitraining_uninstall() {
+// Remove tables.
+ civicrm_initialize();
+ drupal_uninstall_schema('civitraining');
+}
+
+
+
+/**
+* Implementation of hook_schema().
+*/
+function civitraining_schema() {
+$schema['training_ni'] = array(
+'description' => t('Stores Country Id.'),
+'fields' => array(
+      'id' => array(
+        'description' => 'The primary identifier',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'entity_id' => array(
+        'description' => 'Entity Id for contact we are storing.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'ni' => array(
+        'description' => 'Ni Mumber/Country id for the contact',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+    ),
+    'primary key' => array('id'),
+    );
+
+return $schema;
+}

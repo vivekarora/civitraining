@@ -1,0 +1,270 @@
+<?php
+/**
+ * @file
+ *  A module to understand hooks.	
+ */
+
+/*
+* hook_civicrm_config implementation for setting the template path
+*/
+function mypage3_civicrm_config(&$config) {
+
+	  $mypage3Root = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+
+	  // fix php include path
+	  $include_path = $mypage3Root . PATH_SEPARATOR . get_include_path();
+	  set_include_path($include_path);
+
+	  // fix template path
+	  $templateDir = $mypage3Root . 'templates' . DIRECTORY_SEPARATOR;
+	  $template = CRM_Core_Smarty::singleton();
+
+	  if (is_array($template->template_dir)) {
+
+	    $template->template_dir = array_merge(array($templateDir),
+	      $template->template_dir
+	    );
+
+	  }else {
+
+	    $template->template_dir = array($templateDir, $template->template_dir);
+
+	  }
+
+}
+
+/*
+* hook_civicrm_buildForm implementation for adding one more field in Add Individual form
+*/
+	
+function mypage3_civicrm_buildForm($formName, &$form) {
+
+	$contactType = $form->getVar('_contactType');
+	if ($formName == 'CRM_Contact_Form_Contact' &&  $contactType == "Individual") {
+		
+		if ($form->getAction() == CRM_Core_Action::UPDATE) {
+		  	
+			$params = array( 1  => array($form->getVar( '_contactId' ), 'Integer'));
+			$ni = CRM_Core_DAO::singleValueQuery("SELECT ni FROM training_ni where entity_id = %1",$params);
+			$defaults['training_ni'] = $ni;
+		  	$form->setDefaults($defaults);
+
+		}
+		 
+		$form->addElement( 'text', 'training_ni', ts('NI number'));
+		
+	  }
+}
+
+/*
+* hook_civicrm_validate implementation for validation of Individual form new fields
+*/
+
+function mypage3_civicrm_validate($formName, &$fields, &$files, &$form){
+		
+	$errors = array();
+	$contactType = $form->getVar('_contactType');
+
+	if ($formName == 'CRM_Contact_Form_Contact' &&  $contactType == "Individual") {	
+
+		require_once 'CRM/Utils/Array.php';
+		$trainingNi 	= CRM_Utils_Array::value('training_ni', $fields);
+		$validPattern 	= "{[A-Z][A-Z]\s\d\d\s\d\d\s\d\d\s[A-Z]}";
+
+		preg_match($validPattern, CRM_Utils_Array::value('training_ni', $fields) , $validMatch);	
+		   	
+		if(empty($validMatch)){
+		
+			$errors['training_ni'] = ts('Please enter valid Ni Number(Example:AB 12 34 56 C)');
+
+			return	$errors;
+
+		     
+		}else{
+
+			 return true;	
+
+		}	
+
+	}
+
+}
+
+/*
+* hook_civicrm_postProcess implementation for insert/update
+*/
+
+function mypage3_civicrm_postProcess($formName, &$form){
+	
+	$contactType = $form->getVar('_contactType');
+
+	if($formName == 'CRM_Contact_Form_Contact' &&  $contactType == "Individual"){
+	
+		$values = $form->exportValues( );
+		$params = array( 1  => array($form->getVar( '_contactId' ), 'Integer'),
+				 2  => array($values['training_ni'], 'String'));
+
+		if($form->getAction() == CRM_Core_Action::ADD){
+
+		  $query = "INSERT INTO training_ni SET 
+			    entity_id = %1, 
+			    ni = %2";
+
+		}else{
+		  $query = "UPDATE training_ni SET ni=%2 
+				  WHERE entity_id = %1";
+		}
+
+		CRM_Core_DAO::executeQuery($query,$params);
+	}
+
+		if($formName == 'CRM_Profile_Form_Edit') {
+				$contact_id = $form->getVar('_id');
+                              $params = array( 1  => array($contact_id, 'Integer'));
+				$email = CRM_Core_DAO::singleValueQuery("SELECT email FROM civicrm_email WHERE contact_id = %1", $contact_id);
+					if($email != '' && valid_email_address($email)) {
+						// drupal mail will be fired here
+						$params['subject'] = "Test subject";
+						$params['message'] = "Test message";
+						drupal_mail('This is test body', 'signup', $email, language_default(), $params, NULL, TRUE);	
+					}
+				
+				
+		}
+		
+}
+
+/*
+* hook_civicrm_custom implementation for updating custom fields  
+*/
+
+function mypage3_civicrm_custom( $op, $groupID, $entityID, &$params ) {
+
+	if($groupID == 5){
+
+		$queryParams = array( 1  => array($entityID, 'Integer'),
+				      2  => array(base64_encode($params['1']['value']), 'String'));
+		$query       = "UPDATE civicrm_value_secret_info_5 SET  
+				ssn_10 =%2 where entity_id = %1";
+
+		CRM_Core_DAO::executeQuery($query,$queryParams);	
+		
+	}else{
+		return;
+	}
+		
+}
+
+/*
+* hook_permission implementation
+*/
+	
+function mypage3_permission(){
+
+	return array(
+		'access_secret_stuff' =>
+			array('title' => t('Access CiviCRM Training secret stuff'),
+				'description' => t('Access Civicrm secret stuff'),
+			),
+	           );
+
+}
+
+/*
+* hook_civicrm_pageRun implementation 
+*/
+	
+function mypage3_civicrm_pageRun(&$page){
+
+	$contactID  = $page->getVar('_contactId');
+	$entityType = $page->get('contactType');
+
+	if($entitySubType = $page->get('contactSubtype')){
+	   $entitySubType = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($entitySubType, CRM_Core_DAO::VALUE_SEPARATOR));
+	}
+
+	if($page->getVar('_name') == "CRM_Contact_Page_View_Summary" && $entityType == 'Individual'){
+		$params = array( 1  => array($contactID, 'Integer'));
+		$ni 	= CRM_Core_DAO::singleValueQuery("SELECT ni FROM training_ni where entity_id = %1",$params);
+		$page->assign( 'niNumber',  $ni);
+					
+		$groupTree =& CRM_Core_BAO_CustomGroup::getTree($entityType, $page, $contactID, NULL, $entitySubType);		
+
+		$niEncodedValue = $groupTree[5]['fields'][10]['customValue'][1]['data'];
+		$groupTree[5]['fields'][10]['customValue'][1]['data'] = user_access('access secret stuff') ? base64_decode($niEncodedValue) : substr(base64_decode($niEncodedValue), -4);
+		CRM_Core_BAO_CustomGroup::buildCustomDataView($page, $groupTree);
+	}
+			
+}
+
+/*
+* hook_civicrm_tabs implementation 
+*/
+function mypage3_civicrm_tabs(&$tabs, $contactID){
+
+	$query = "
+	SELECT 	postal_code
+	FROM civicrm_address
+	WHERE contact_id = %1 AND is_primary=1";
+    	$params = array(1 => array($contactID, 'Integer'));
+
+    	$postcode = CRM_Core_DAO::singleValueQuery($query, $params);
+
+	if(trim($postcode)){
+        // TODO:
+        // Url doen't loads in the tab, we can use iframe inside some internal url if we are really looking load content of the url inside the tab 
+    	$url = "http://www.neighbourhood.statistics.gov.uk/dissemination/NeighbourhoodSummary.do?
+width=1440&a=3&i=1001&m=0&s=1284550555705&enc=1&profileSearchText=".$postcode;
+
+    	$tabs[] = array( 'id'    => 'NeighbourhoodTab',
+                     'url'   => $url,
+                     'title' => 'NeighbourHood Tab',
+                     'weight' => 300 );
+
+	}
+}
+
+/*
+* hook_civicrm_tokens implementation 
+*/	
+function mypage3_civicrm_tokens(&$tokens) {
+  $tokens['organization'] = array(
+    'organization.primarycontact' => 'Primary contact name',
+  );
+}
+/*
+* hook_civicrm_tokenValues implementation 
+* I was not able to test the functionality as I am not sure how i can test that. 
+*/
+function mypage3_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+
+  if (!empty($tokens['organization'])) {
+    	$dao = &CRM_Core_DAO::executeQuery("
+     	    SELECT 
+		child_contact.id child_id, child_contact.display_name child_display_name, child_contact.employer_id child_employeer_id,
+		parent_contact.display_name parent_display_name
+	    FROM 
+		civicrm_contact child_contact,civicrm_contact parent_contact  
+	    where 
+		  parent_contact.id = child_contact.employer_id 
+		AND  
+		  child_contact.employer_id is not null
+		AND
+		  child_contact.contact_type='Individual'
+		AND
+		  child_contact.id IN ($cids)
+		AND	
+		  child_contact.id IN (SELECT r.contact_id_a
+      	    			       FROM civicrm_relationship r 
+                                       WHERE  r.contact_id_a = child_contact.id 
+                                              AND r.relationship_type_id = 5
+                                              AND r.is_active = 1 )
+					      AND r.is_permission_a_b = 1)
+                                        ");
+
+	while ($dao->fetch()) {
+		$values[$dao->child_id]['organization.primarycontact'] = $dao->parent_display_name;
+	}
+  }
+}
+

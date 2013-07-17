@@ -1,0 +1,29 @@
+{literal}
+<script type="text/javascript">    
+alert("ramu");                                                                                                                                                                                                                            
+cj( function( ) {                                                                                                                                                                                                                        
+    cj('#billingcheckbox').click( function( ) {                                                                                                                                                                                          
+        sameAddress( this.checked );                                                                                                                                                                                                     
+        });                                                                                                                                                                                                                              
+    });                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                         
+function sameAddress( setValue ) {                                                                                                                                                                                                       
+    var locationTypeInProfile = 1;                                                                                                                                                                                                       
+    var orgID = field = fieldName = null;                                                                                                                                                                                                
+    cj('.billing_name_address-section input').each( function( i ){                                                                                                                                                                       
+            orgID = cj(this).attr('id');                                                                                                                                                                                                 
+            field = orgID.split('-');                                                                                                                                                                                                    
+            fieldName = field[0].replace('billing_', '');                                                                                                                                                                                
+            if ( field[1] ) {                                                                                                                                                                                                            
+            fieldName = fieldName.replace('_id', '');                                                                                                                                                                                    
+            fieldName =  fieldName + '-' + locationTypeInProfile;                                                                                                                                                                        
+            }                                                                                                                                                                                                                            
+            if ( setValue ) {                                                                                                                                                                                                            
+            cj(this).val( cj('#' + fieldName ).val() );                                                                                                                                                                                  
+            } else {                                                                                                                                                                                                                     
+            cj('#' + fieldName ).val('');                                                                                                                                                                                                
+            }                                                                                                                                                                                                                            
+            });                                                                                                                                                                                                                          
+}
+</script>                                                                                                                                                                                                                                        
+{/literal}  

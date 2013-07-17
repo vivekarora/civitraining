@@ -1,0 +1,12 @@
+<?php
+
+class CRM_MyPage2_BAO_Utills  {
+
+
+  static function getContactDetailById($contactId,$returnArray = array()) {
+  
+  }
+
+
+}
+
