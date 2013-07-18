@@ -395,6 +395,9 @@ cj(function($) {
     if (!isNaN(cid) || ! checkSimilar) {
      return;//no dupe check if this is a modif or if checkSimilar is disabled (contact_ajax_check_similar in civicrm_setting table)
     }
+
+// Added by Vivek Arora for ajax dedupe check Starts
+
     cj('#last_name').blur(function () {
       // Close msg if it exists
       lastnameMsg && lastnameMsg.close && lastnameMsg.close();
@@ -428,6 +431,9 @@ cj(function($) {
       });
     });
   });
+
+// Added by Vivek Arora for ajax dedupe check Ends
+
 });
 </script>
 {/literal}
