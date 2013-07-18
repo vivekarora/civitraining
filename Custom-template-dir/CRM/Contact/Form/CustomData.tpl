@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-RAMU
 {* this template is used for building tabbed custom data *}
 {if $cdType }
     {include file="CRM/Custom/Form/CustomData.tpl"}

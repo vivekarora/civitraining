@@ -98,6 +98,7 @@
         }
       });
     }
+// Added by Vivek Arora to handel custom fields starts
   cj(function(){
 	cj("tr.custom_12_-1-row").hide();
 	cj("tr.custom_13_-1-row").hide();
@@ -105,6 +106,9 @@
 	cj("input[name='custom_11_-1']").change(
 	    function(e)
 	    {
+		cj("tr.custom_12_-1-row").hide();
+		cj("tr.custom_13_-1-row").hide();
+		cj("tr.custom_14_-1-row").hide();
 		var selectVal = cj(this).val();
 		if(selectVal=="Road")
 		{
@@ -120,6 +124,7 @@
 		}
 	    });
    });
+// Added by Vivek Arora to handel custom fields ends
     {/literal}
   </script>
 

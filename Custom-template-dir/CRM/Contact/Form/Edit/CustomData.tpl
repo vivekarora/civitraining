@@ -98,6 +98,7 @@
         }
       });
     }
+// Added by Vivek Arora to handel custom fields starts
   cj(function(){
 	cj("tr.custom_12_-1-row").hide();
 	cj("tr.custom_13_-1-row").hide();
@@ -123,6 +124,7 @@
 		}
 	    });
    });
+// Added by Vivek Arora to handel custom fields ends
     {/literal}
   </script>
 
