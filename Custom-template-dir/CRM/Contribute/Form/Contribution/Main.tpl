@@ -27,7 +27,9 @@
 {* Callback snippet: Load payment processor *}
 {if $snippet}
 {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
+{* Added by Vivek Arora for Jquery & Civicrm tasks starts *}
 <input type="checkbox" id="sameAddress"> {ts}Address is same as billing{/ts}
+{* Added by Vivek Arora for Jquery & Civicrm tasks starts *}
   {if $is_monetary}
   {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
     {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
@@ -478,6 +480,7 @@
     updatePriceSetHighlight();
 	var locationTypeInProfile = 1;
     	var orgID = field = fieldName = null;
+       // Added by Vivek Arora for Jquery & Civicrm tasks starts
 	cj('#sameAddress').click( function( ) {
         	var checkboxStatus = this.checked;
 		cj('.billing_name_address-section input,select').each( function( i ){
@@ -496,6 +499,7 @@
 		});
 
     	});
+      // Added by Vivek Arora for Jquery & Civicrm tasks ends
   });
   {/literal}
 </script>
