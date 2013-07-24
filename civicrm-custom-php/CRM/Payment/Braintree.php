@@ -29,9 +29,7 @@ class CRM_Core_Payment_Braintree extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Braintree');
     
-    // for now hardcoded enviorment variable as sandbox, value of enviorment will be provided on merchant signup by braintree
-   // $environment =  ($mode == "test") ? 'sandbox':'merchant';
-    $environment = 'sandbox';
+    $environment =  ($mode == "test") ? 'sandbox':'merchant';
     Braintree_Configuration::environment($environment);
     Braintree_Configuration::merchantId($paymentProcessor["user_name"]);
     Braintree_Configuration::publicKey($paymentProcessor["password"]);
@@ -68,41 +66,8 @@ class CRM_Core_Payment_Braintree extends CRM_Core_Payment {
 
  function doTransferCheckout(&$params,$component='contribute') {
 
-    $config = CRM_Core_Config::singleton();
+     CRM_Core_Error::fatal(ts('Use direct billing instead of Transfer method.'));
 
-    if ($component != 'contribute' && $component != 'event') {
-      CRM_Core_Error::fatal(ts('Component is invalid'));
-    }
-
-    $notifyURL = $config->userFrameworkResourceURL . "extern/btNotify.php";
-
-	$trData = Braintree_TransparentRedirect::transactionData(
-	  array(
-	    'transaction' => array(
-	      'type' => Braintree_Transaction::SALE,
-	      'amount' => '100.00'
-	    ),
-	    'redirectUrl' => $notifyURL
-	  )
-	);
-
- 
-	    $form = "<body onLoad='document.btform.submit();'>";	
-		$form .= "<form name='btform' id='btformId' method='post' action='".Braintree_TransparentRedirect::url()."'>";
-		$form .= "<p>Please wait while your payment is being processed...</p>";
-		foreach ($params as $key => $value){ 
-			if(!empty($value)){
-				if ($key == 'return' || $key == 'cancel_return' || $key == 'notify_url') {
-					$value = str_replace('%2F', '/', $value);
-				}
-				$form .= "<input type='hidden' name='".$key."' value='".$value."' size='60' />";
-			}
-		}	
-		$form .='<input type="hidden" name="tr_data" value="'.htmlentities($trData).'" />';
-
-		$form .= "</form></body>";
-	    echo $form;
-	    exit;
   }
   /**
    * Submit a payment using Advanced Integration Method
